@@ -22,6 +22,7 @@ buildPythonPackage rec {
   # test_aside_basic times out,
   # test_aside_cancel fails because modifies PYTHONPATH and cant find pytest
   checkPhase = ''
+    rm -r tests/__pycache__ # was packaged with this accidentally
     pytest --deselect tests/test_task.py::test_aside_basic --deselect tests/test_task.py::test_aside_cancel
   '';
 
