@@ -1,11 +1,15 @@
 { lib
 , stdenv
 , buildPythonPackage
-, fetchPypi
+, fetchFromGitHub
 , pyopenssl
 , libuv
 , psutil
 , isPy27
+, cython
+, libtool
+, autoconf
+, automake
 , CoreServices
 , ApplicationServices
 # Check Inputs
@@ -15,15 +19,25 @@
 
 buildPythonPackage rec {
   pname = "uvloop";
-  version = "0.14.0";
+  version = "unstable-2020-04-25";
   disabled = isPy27;
 
-  src = fetchPypi {
-    inherit pname version;
-    sha256 = "07j678z9gf41j98w72ysrnb5sa41pl5yxd7ib17lcwfxqz0cjfhj";
+  src = fetchFromGitHub {
+    owner = "MagicStack";
+    repo = pname;
+    rev = "465717fdaf2cb260a1c4b230925a537afc22cedb";
+    sha256 = "1kgc2y08fndh4696rsd2ngdbpk2d94vd79fx1zf2p9816s0lbska";
+    fetchSubmodules = true;
   };
 
   patches = lib.optional stdenv.isDarwin ./darwin_sandbox.patch;
+
+  postPatch = ''
+    substituteInPlace setup.py \
+      --replace "/bin/sh" "sh"
+  '';
+
+  nativeBuildInputs = [ cython libtool automake autoconf ];
 
   buildInputs = [
     libuv
