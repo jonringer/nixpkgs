@@ -2,6 +2,8 @@
 , buildPythonPackage
 , fetchFromGitHub
 , isPy3k
+, pythonAtLeast
+, pythonOlder
 , requests
 , requests_oauthlib
 , isodate
@@ -10,7 +12,7 @@
 , typing
 , aiohttp
 , aiodns
-, pytest
+, pytestCheckHook
 , httpretty
 , mock
 , futures
@@ -35,14 +37,21 @@ buildPythonPackage rec {
   ] ++ lib.optionals (!isPy3k) [ enum34 typing ]
     ++ lib.optionals isPy3k [ aiohttp aiodns ];
 
-  checkInputs = [ pytest httpretty ]
+  checkInputs = [ pytestCheckHook httpretty ]
     ++ lib.optionals (!isPy3k) [ mock futures ]
-    ++ lib.optional isPy3k trio;
+    # avoid disabling python3.5 just for 2 tests
+    ++ lib.optionals (pythonAtLeast "3.6") [ trio ];
 
   # Deselected tests require network access
-  checkPhase = ''
-    pytest tests/ -k "not test_conf_async_trio_requests"
-  '';
+  disabledTests = [
+    "test_conf_async_trio_requests"
+  ];
+
+  # requires trio, which makes this unusable for python3.5
+  pytestFlagsArray = lib.optionals (pythonOlder "3.6") [
+    "--ignore=tests/asynctests/test_universal_http.py"
+    "--ignore=tests/asynctests/test_pipeline.py"
+  ];
 
   meta = with lib; {
     description = "The runtime library 'msrest' for AutoRest generated Python clients.";
