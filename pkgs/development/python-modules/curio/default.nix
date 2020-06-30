@@ -2,30 +2,36 @@
 , buildPythonPackage
 , fetchPypi
 , isPy3k
-, pytest
+, isPy36
+, pythonOlder
+, contextvars
+, pytestCheckHook
 , sphinx
 }:
 
 buildPythonPackage rec {
   pname = "curio";
   version = "1.2";
+  disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
     sha256 = "90f320fafb3f5b791f25ffafa7b561cc980376de173afd575a2114380de7939b";
   };
 
-  disabled = !isPy3k;
+  checkInputs = [ pytestCheckHook sphinx ]
+    ++ lib.optionals isPy36 [ contextvars ];
 
-  checkInputs = [ pytest sphinx ];
+  disabledTests = [
+    "aside"               # times out
+    "ssl_outgoing"        # touches network
+  ] ++ lib.optionals (pythonOlder "3.7") [
+    # unsupported syntax <3.7
+    "asyncio_consumer"
+    "uevent_get_asyncio"
+  ];
 
   __darwinAllowLocalNetworking = true;
-
-  # test_aside_basic times out,
-  # test_aside_cancel fails because modifies PYTHONPATH and cant find pytest
-  checkPhase = ''
-    pytest --deselect tests/test_task.py::test_aside_basic --deselect tests/test_task.py::test_aside_cancel -k "not test_ssl_outgoing"
-  '';
 
   meta = with lib; {
     homepage = "https://github.com/dabeaz/curio";
