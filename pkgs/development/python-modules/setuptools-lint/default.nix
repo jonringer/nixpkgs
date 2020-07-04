@@ -1,4 +1,4 @@
-{ stdenv, buildPythonPackage, fetchPypi, pylint }:
+{ stdenv, buildPythonPackage, fetchPypi, pylint, toml }:
 
 buildPythonPackage rec {
   pname = "setuptools-lint";
@@ -9,7 +9,9 @@ buildPythonPackage rec {
     sha256 = "16a1ac5n7k7sx15cnk03gw3fmslab3a7m74dc45rgpldgiff3577";
   };
 
-  propagatedBuildInputs = [ pylint ];
+  propagatedBuildInputs = [ pylint toml ];
+
+  pythonImportsCheck = [ "setuptools_lint" ];
 
   meta = with stdenv.lib; {
     description = "Package to expose pylint as a lint command into setup.py";
