@@ -1,8 +1,9 @@
-{ stdenv, buildPythonPackage, fetchFromGitHub, numpy, future, spglib, glibcLocales, pytest, scipy }:
+{ stdenv, buildPythonPackage, fetchFromGitHub, isPy27, numpy, future, spglib, glibcLocales, pytest, scipy }:
 
 buildPythonPackage rec {
   pname = "seekpath";
   version = "2.0.1";
+  disabled = isPy27;
 
   src = fetchFromGitHub {
     owner = "giovannipizzi";
