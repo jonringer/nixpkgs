@@ -4,6 +4,7 @@
 , pythonAtLeast
 , nose
 , nibabel
+, packaging
 , pydicom
 }:
 
@@ -21,7 +22,7 @@ buildPythonPackage rec {
     sha256 = "1n24pp3rqz7ss1z6276fxynnppraxadbl3b9p8ijrcqnpzbzih7p";
   };
 
-  propagatedBuildInputs = [ nibabel pydicom ];
+  propagatedBuildInputs = [ nibabel packaging pydicom ];
 
   checkInputs = [ nose ];
   checkPhase = ''
