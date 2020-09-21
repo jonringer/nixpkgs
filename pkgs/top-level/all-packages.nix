@@ -19896,7 +19896,7 @@ in
 
   calibre-py2 = libsForQt514.callPackage ../applications/misc/calibre { pythonPackages = python2Packages; };
 
-  calibre-py3 = libsForQt514.callPackage ../applications/misc/calibre { pythonPackages = python3Packages; };
+  calibre-py3 = libsForQt515.callPackage ../applications/misc/calibre { pythonPackages = python3Packages; };
 
   calibre = calibre-py3;
 
