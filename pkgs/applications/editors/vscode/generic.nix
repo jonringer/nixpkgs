@@ -1,7 +1,7 @@
 { stdenv, lib, makeDesktopItem
 , unzip, libsecret, libXScrnSaver, wrapGAppsHook
 , gtk2, atomEnv, at-spi2-atk, autoPatchelfHook
-, systemd, fontconfig, libdbusmenu
+, systemd, fontconfig, libdbusmenu, buildFHSUserEnvBubblewrap
 
 # Attributes inherit from specific versions
 , version, src, meta, sourceRoot
@@ -10,8 +10,7 @@
 
 let
   inherit (stdenv.hostPlatform) system;
-in
-  stdenv.mkDerivation {
+  unwrapped = stdenv.mkDerivation {
 
     inherit pname version src sourceRoot;
 
@@ -93,4 +92,56 @@ in
       '';
 
     inherit meta;
+  };
+in if !stdenv.isLinux
+  # for platforms where buildFHSUserEnv isn't needed or supported
+  then unwrapped
+
+  # Vscode and variants allow for users to download and use extensions
+  # which often include the usage of pre-built binaries.
+  # This has been an on-going painpoint for many users, as
+  # a full extension update cycle has to be done through nixpkgs
+  # in order to create or update extensions.
+  # See: #83288 #91179 #73810 #41189
+  #
+  # buildFHSUserEnv allows for users to use the existing vscode
+  # extension tooling without significant pain.
+  else buildFHSUserEnvBubblewrap {
+    name = executableName;
+
+    # additional libraries which are commonly needed for extensions
+    targetPkgs = pkgs: (with pkgs; [
+      # dotnet
+      curl
+      icu
+      libunwind
+      libuuid
+      openssl
+      zlib
+
+      # mono
+      krb5
+    ]);
+
+    # restore desktop item icons
+    extraInstallCommands = ''
+      mkdir -p $out/share/applications
+      for item in ${unwrapped}/share/applications/*.desktop; do
+        ln -s $item $out/share/applications/
+      done
+    '';
+
+    runScript = "${unwrapped}/bin/${executableName}";
+
+    # vscode likes to kill the parent so that the
+    # gui application isn't attached to the terminal session
+    dieWithParent = false;
+
+    passthru = {
+      inherit unwrapped executableName;
+      inherit (unwrapped) pname version; # for home-manager module
+    };
+
+    inherit meta;
   }
+
