@@ -3549,7 +3549,7 @@ in
 
   z-lua = callPackage ../tools/misc/z-lua { };
 
-  zabbix-cli = callPackage ../tools/misc/zabbix-cli { };
+  zabbix-cli = python3Packages.callPackage ../tools/misc/zabbix-cli { };
 
   zabbixctl = callPackage ../tools/misc/zabbixctl { };
 

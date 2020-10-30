@@ -1,24 +1,26 @@
-{ fetchFromGitHub, lib, python2Packages }:
-let
-  pythonPackages = python2Packages;
+{ fetchFromGitHub, lib, buildPythonApplication, requests }:
 
-in pythonPackages.buildPythonApplication rec {
+buildPythonApplication rec {
   pname = "zabbix-cli";
   version = "2.2.1";
 
-  propagatedBuildInputs = with pythonPackages; [ ipaddr requests ];
+  src = fetchFromGitHub {
+    owner = "usit-gd";
+    repo = "zabbix-cli";
+    rev = version;
+    sha256 = "0bb3vk5waxbs3b7xplmwdys713nhab7ks7scipwlx3s0pa9zlg0n";
+  };
+
+  propagatedBuildInputs = [ requests ];
 
   # argparse is part of the standardlib
   prePatch = ''
     substituteInPlace setup.py --replace "'argparse'," ""
   '';
 
-  src = fetchFromGitHub {
-    owner = "usit-gd";
-    repo = "zabbix-cli";
-    rev = version;
-    sha256 = "0wzmrn8p09ksqhhgawr179c4az7p2liqr0l4q2dra62bxliawyqz";
-  };
+  checkPhase = ''
+    $out/bin/zabbix-cli --help > /dev/null
+  '';
 
   meta = with lib; {
     description = "Command-line interface for Zabbix";
