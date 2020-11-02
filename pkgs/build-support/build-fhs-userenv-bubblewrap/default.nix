@@ -1,4 +1,4 @@
-{ callPackage, runCommandLocal, writeShellScriptBin, stdenv, coreutils, bubblewrap }:
+{ callPackage, runCommandLocal, writeShellScriptBin, stdenv, lib, coreutils, bubblewrap }:
 
 let buildFHSEnv = callPackage ./env.nix { }; in
 
@@ -6,6 +6,7 @@ args @ {
   name,
   runScript ? "bash",
   extraInstallCommands ? "",
+  dieWithParent ? true,
   meta ? {},
   passthru ? {},
   ...
@@ -14,7 +15,7 @@ args @ {
 with builtins;
 let
   env = buildFHSEnv (removeAttrs args [
-    "runScript" "extraInstallCommands" "meta" "passthru"
+    "runScript" "extraInstallCommands" "meta" "passthru" "dieWithParent"
   ]);
 
   chrootenv = callPackage ./chrootenv {};
@@ -95,7 +96,7 @@ let
       --chdir "$(pwd)" \
       --unshare-all \
       --share-net \
-      --die-with-parent \
+      ${lib.optionalString dieWithParent "--die-with-parent"} \
       --ro-bind /nix /nix \
       ${etcBindFlags} \
       $ro_mounts \
