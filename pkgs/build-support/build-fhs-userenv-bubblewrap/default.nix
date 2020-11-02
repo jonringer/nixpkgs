@@ -96,6 +96,7 @@ let
       --chdir "$(pwd)" \
       --unshare-all \
       --share-net \
+      --setenv QT_X11_NO_MITSHM 1 \
       ${lib.optionalString dieWithParent "--die-with-parent"} \
       --ro-bind /nix /nix \
       ${etcBindFlags} \
