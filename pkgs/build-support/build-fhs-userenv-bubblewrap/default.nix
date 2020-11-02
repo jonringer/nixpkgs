@@ -23,6 +23,8 @@ let
     files = [
       # NixOS Compatibility
       "static"
+      # Shells
+      "bashrc"
       # Users, Groups, NSS
       "passwd"
       "group"
