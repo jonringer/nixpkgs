@@ -26,6 +26,10 @@ let
       "static"
       # Shells
       "bashrc"
+      "zshenv"
+      "zshrc"
+      "zinputrc"
+      "zprofile"
       # Users, Groups, NSS
       "passwd"
       "group"
