@@ -1,7 +1,6 @@
 { lib
-, fetchpatch
 , buildPythonPackage
-, fetchPypi
+, fetchFromGitHub
 , pythonOlder
 , isPy27
 , cmake
@@ -10,8 +9,9 @@
 , six
 , typing-extensions
 , typing
+, pybind11
 , pytestrunner
-, pytest
+, pytestCheckHook
 , nbval
 , tabulate
 }:
@@ -25,12 +25,19 @@ buildPythonPackage rec {
   # Also support for Python 2 will be deprecated from Onnx v1.8.
   disabled = isPy27;
 
-  src = fetchPypi {
-    inherit pname version;
-    sha256 = "5f787fd3ce1290e12da335237b3b921152157e51aa09080b65631b3ce3fcc50c";
+  src = fetchFromGitHub {
+    owner = "onnx";
+    repo = "onnx";
+    rev = "v${version}";
+    sha256 = "0hhvdalcjsf3rdpplccsqw1wmbrz19r706z1xjs9x8cggmcg83gc";
   };
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    pytestrunner # setup_requires will fail if not present
+  ];
+
+  buildInputs = [ pybind11 ];
 
   propagatedBuildInputs = [
     protobuf
@@ -40,8 +47,7 @@ buildPythonPackage rec {
   ] ++ lib.optional (pythonOlder "3.5") [ typing ];
 
   checkInputs = [
-    pytestrunner
-    pytest
+    pytestCheckHook
     nbval
     tabulate
   ];
@@ -59,13 +65,22 @@ buildPythonPackage rec {
     rm -r $out/bin
   '';
 
+  preCheck = ''
+    export HOME=$TMPDIR
+    cd onnx/test
+  '';
+
+  disabledTests = [
+    "OnnxBackendRealModelTest" # tries to download models from s3
+  ];
+
   # The setup.py does all the configuration
   dontUseCmakeConfigure = true;
 
-  meta = {
+  meta = with lib; {
     homepage    = "http://onnx.ai";
     description = "Open Neural Network Exchange";
-    license     = lib.licenses.mit;
-    maintainers = [ lib.maintainers.acairncross ];
+    license     = licenses.mit;
+    maintainers = with maintainers; [ acairncross jonringer ];
   };
 }
