@@ -1,29 +1,15 @@
 { stdenv, fetchFromGitHub, cmake, curl, tzdata, fetchpatch, substituteAll }:
 
 stdenv.mkDerivation rec {
-  pname = "howard-hinnant-date-unstable";
-  version = "2020-03-09";
+  pname = "howard-hinnant-date";
+  version = "3.0.0";
 
   src = fetchFromGitHub {
     owner = "HowardHinnant";
     repo = "date";
-    rev = "4c1968b8f038483037cadfdbad3215ce21d934bb";
-    sha256 = "0dywrf18v1znfnz0gdxgi2ydax466zq34gc1vvg2k7vq17a30wq3";
+    rev = "v${version}";
+    sha256 = "1qvlx6yzjsacj8zwl8k43cm00l1c41xdp1fqm8sq7ilglw06x8jk";
   };
-
-  patches = [
-    (fetchpatch {
-      url = "https://github.com/HowardHinnant/date/commit/e56b2dce7e89a92e1b9b35caa13b3e938c4cedea.patch";
-      sha256 = "0m3qbhq7kmm9qa3jm6d2px7c1dxdj5k9lffgdvqnrwmhxwj1p9n2";
-    })
-    # Without this patch, this library will drop a `tzdata` directory into
-    # `~/Downloads` if it cannot find `/usr/share/zoneinfo`. Make the path it
-    # searches for `zoneinfo` be the one from the `tzdata` package.
-    (substituteAll {
-      src = ./make-zoneinfo-available.diff;
-      inherit tzdata;
-    })
-  ];
 
   nativeBuildInputs = [ cmake ];
   buildInputs = [ curl ];
