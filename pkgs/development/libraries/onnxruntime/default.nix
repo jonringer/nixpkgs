@@ -1,25 +1,28 @@
 { stdenv, fetchFromGitHub, glibcLocales
-, cmake, python3, libpng, zlib
+, cmake, python3
+
+, eigen
+, gtest
+, grpc
+, howard-hinnant-date
+, protobuf
+, libpng
+, zlib
+, flatbuffers
 }:
 
+let
+  python3-env = python3.withPackages (ps: with ps; [ flake8 ]);
+in
 stdenv.mkDerivation rec {
   pname = "onnxruntime";
-  version = "1.3.1";
+  version = "1.5.3";
 
   src = fetchFromGitHub {
     owner = "microsoft";
     repo = "onnxruntime";
     rev = "v${version}";
-    sha256 = "0rbk1jbfc447x2wybz2hsba6w1ij0fq21996l52cqv39898lvy9d";
-    # TODO: use nix-versions of grpc, onnx, eigen, googletest, etc.
-    # submodules increase src size and compile times significantly
-    # not currently feasible due to how integrated cmake build is with git
-    fetchSubmodules = true;
-    # Remove unicode file names which leads to different checksums on HFS+
-    # vs. other filesystems because of unicode normalisation.
-    postFetch = ''
-      rm -rf $out/winml/test/collateral/models/UnicodePath/
-    '';
+    sha256 = "03w1nbydf76kxh1yfy87c65ydc40ywk2zysjpch0s4gspc3vbyyz";
   };
 
   # TODO: build server, and move .so's to lib output
@@ -27,18 +30,35 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     cmake
-    python3 # for shared-lib or server
+    python3-env # for shared-lib or server
   ];
 
   buildInputs = [
+    eigen
+    protobuf
+    grpc
+    gtest
+    howard-hinnant-date
     # technically optional, but highly recommended
     libpng
     zlib
   ];
 
+  # these are not able to be passed as cmake flags, unfortunately
+  postPatch = ''
+    rm -r cmake/external/date
+    ln -svf ${howard-hinnant-date.src} cmake/external/date
+    rm -r cmake/external/flatbuffers
+    ln -svf ${flatbuffers.src} cmake/external/flatbuffers
+    rm -r cmake/external/onnx
+    ln -svf ${python3.pkgs.onnx.src} cmake/external/onnx
+  '';
+
   cmakeDir = "../cmake";
 
   cmakeFlags = [
+    # pull gtest from build environment, instead of vendored submodule
+    "-Donnxruntime_PREFER_SYSTEM_LIB=ON"
     "-Donnxruntime_USE_OPENMP=ON"
     "-Donnxruntime_BUILD_SHARED_LIB=ON"
     "-Donnxruntime_ENABLE_LTO=ON"
