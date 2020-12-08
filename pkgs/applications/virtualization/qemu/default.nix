@@ -17,6 +17,7 @@
 , usbredirSupport ? spiceSupport, usbredir
 , xenSupport ? false, xen
 , cephSupport ? false, ceph
+, withZstdSupport? true, zstd
 , openGLSupport ? sdlSupport, mesa, epoxy, libdrm
 , virglSupport ? openGLSupport, virglrenderer
 , smbdSupport ? false, samba
@@ -52,7 +53,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ python python.pkgs.sphinx pkgconfig flex bison ]
     ++ optionals gtkSupport [ wrapGAppsHook ];
   buildInputs =
-    [ zlib glib perl pixman
+    [ zlib zstd glib perl pixman
       vde2 texinfo makeWrapper lzo snappy
       gnutls nettle curl
     ]
