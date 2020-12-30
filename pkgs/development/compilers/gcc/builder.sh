@@ -127,6 +127,13 @@ if test "$noSysDirs" = "1"; then
         "FLAGS_FOR_TARGET=$EXTRA_FLAGS_FOR_TARGET $EXTRA_LDFLAGS_FOR_TARGET"
     )
 
+    if test -n "${enableParallelBuilding-}"; then
+        makeFlagsArray+=(
+             "-j${NIX_BUILD_CORES:-1}"
+             "-l${NIX_BUILD_CORES:-1}"
+        )
+    fi
+
     if test -z "${targetConfig-}"; then
         makeFlagsArray+=(
             "BOOT_CFLAGS=$EXTRA_FLAGS $EXTRA_LDFLAGS"
