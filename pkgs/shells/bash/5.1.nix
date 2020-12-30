@@ -4,6 +4,7 @@
 , binutils ? null
 , bison
 , util-linux
+, autoconf269
 
   # patch for cygwin requires readline support
 , interactive ? stdenv.isCygwin
@@ -70,7 +71,7 @@ stdenv.mkDerivation rec {
 
   # Note: Bison is needed because the patches above modify parse.y.
   depsBuildBuild = [ buildPackages.stdenv.cc ];
-  nativeBuildInputs = [ bison ]
+  nativeBuildInputs = [ bison autoconf269 ]
     ++ optional withDocs texinfo
     ++ optional stdenv.hostPlatform.isDarwin binutils;
 
