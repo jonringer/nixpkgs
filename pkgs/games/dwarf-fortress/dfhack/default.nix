@@ -58,6 +58,13 @@ let
       xmlRev = "036b662a1bbc96b4911f3cbe74dfa1243b6459bc";
       prerelease = false;
     };
+    "0.47.05" = {
+      dfHackRelease = "0.47.05-beta1";
+      sha256 = "sha256-i/LPUBnkHPkPJPWuMl/QuaKve8wg+1T/P9YEYoCzK/8=";
+      xmlRev = "d531710a807ea842ca0cf40a583eccfa88e1dfbb";
+      prerelease = false;
+    };
+
   };
 
   release = if hasAttr dfVersion dfhack-releases
