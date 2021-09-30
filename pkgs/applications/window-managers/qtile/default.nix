@@ -27,6 +27,10 @@ let
         --replace libpango-1.0.so.0 ${pango.out}/lib/libpango-1.0.so.0
       substituteInPlace libqtile/backend/x11/xcursors.py \
         --replace libxcb-cursor.so.0 ${xcbutilcursor.out}/lib/libxcb-cursor.so.0
+
+      # allow wrapped qtile to be executed
+      substituteInPlace libqtile/core/lifecycle.py \
+        --replace "os.execv(sys.executable, argv)" "os.execv(\"${placeholder "out"}/bin/qtile\", argv)"
     '';
 
     SETUPTOOLS_SCM_PRETEND_VERSION = version;
@@ -59,10 +63,12 @@ let
       maintainers = with maintainers; [ kamilchm ];
     };
   };
-in
-  (python.withPackages (ps: [ unwrapped ])).overrideAttrs (_: {
+
+  wrapped = (python.withPackages (ps: [ unwrapped ])).overrideAttrs (_: {
     # otherwise will be exported as "env", this restores `nix search` behavior
     name = "${unwrapped.pname}-${unwrapped.version}";
     # export underlying qtile package
     passthru = { inherit unwrapped; };
-  })
+  });
+in
+  wrapped
