@@ -1,7 +1,8 @@
 { stdenv, lib, fetchurl, fetchFromGitHub, fixDarwinDylibNames
-, autoconf, boost, brotli, cmake, flatbuffers, gflags, glog, gtest, lz4
-, perl, python3, rapidjson, re2, snappy, thrift, utf8proc, which, xsimd
+, autoconf, boost, brotli, cmake, flatbuffers, gflags, glog, gtest, libevent, lz4
+, openssl , perl, python3, rapidjson, re2, snappy, thrift, utf8proc, which, xsimd
 , zlib, zstd
+, Security
 , enableShared ? !stdenv.hostPlatform.isStatic
 }:
 
@@ -59,6 +60,7 @@ in stdenv.mkDerivation rec {
     autoconf # for vendored jemalloc
     flatbuffers
   ] ++ lib.optional stdenv.isDarwin fixDarwinDylibNames;
+
   buildInputs = [
     boost
     brotli
@@ -66,6 +68,7 @@ in stdenv.mkDerivation rec {
     gflags
     glog
     gtest
+    libevent
     lz4
     rapidjson
     re2
@@ -74,6 +77,10 @@ in stdenv.mkDerivation rec {
     utf8proc
     zlib
     zstd
+  ] ++ lib.optionals (!stdenv.isDarwin) [
+    openssl
+  ] ++ lib.optionals stdenv.isDarwin [
+    Security
   ] ++ lib.optionals enableShared [
     python3.pkgs.python
     python3.pkgs.numpy

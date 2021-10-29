@@ -20,6 +20,12 @@ stdenv.mkDerivation rec {
   buildInputs = [ boost zlib libevent openssl ]
     ++ lib.optionals (!static) [ (python3.withPackages (ps: [ps.twisted])) ];
 
+  propagatedBuildInputs = [
+    libevent
+  ] ++ lib.optionals stdenv.isLinux [
+    openssl
+  ];
+
   preConfigure = "export PY_PREFIX=$out";
 
   patches = [
