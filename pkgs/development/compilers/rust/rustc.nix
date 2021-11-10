@@ -162,6 +162,9 @@ in stdenv.mkDerivation rec {
 
     # remove uninstall script that doesn't really make sense for Nix.
     rm $out/lib/rustlib/uninstall.sh
+
+    # remove temporary build artifacts
+    rm -rf $out/lib/rustlib
   '';
 
   configurePlatforms = [];
