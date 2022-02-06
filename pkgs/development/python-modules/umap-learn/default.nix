@@ -1,21 +1,20 @@
 { lib
 , buildPythonPackage
+, callPackage
 , fetchFromGitHub
-, nose
 , numpy
 , scikit-learn
 , scipy
 , numba
 , pynndescent
-, tensorflow
 , tqdm
-, pytestCheckHook
-, keras
 }:
 
 buildPythonPackage rec {
   pname = "umap-learn";
   version = "0.5.2";
+
+  outputs = [ "out" "tests" ];
 
   src = fetchFromGitHub {
     owner = "lmcinnes";
@@ -33,28 +32,21 @@ buildPythonPackage rec {
     tqdm
   ];
 
-  checkInputs = [
-    nose
-    tensorflow
-    pytestCheckHook
-    keras
-  ];
-
-  preCheck = ''
-    export HOME=$TMPDIR
+  postInstall = ''
+    mv umap/tests $tests
   '';
 
-  disabledTests = [
-    # Plot functionality requires additional packages.
-    # These test also fail with 'RuntimeError: cannot cache function' error.
-    "test_umap_plot_testability"
-    "test_plot_runs_at_all"
+  # do not run tests as part of initial build
+  doCheck = false;
+  passthru.tests = {
+    # the tests are VERY resource intensive
+    full-tests = callPackage ./tests.nix { };
+    # for demonstration
+    run-test-suite = callPackage ./test-suite.nix { };
+  };
 
-    # Flaky test. Fails with AssertionError sometimes.
-    "test_sparse_hellinger"
-
-    # tensorflow maybe incompatible? https://github.com/lmcinnes/umap/issues/821
-    "test_save_load"
+  pytestImportsCheck = [
+    "umap"
   ];
 
   meta = with lib; {

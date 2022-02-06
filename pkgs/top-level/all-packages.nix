@@ -170,6 +170,8 @@ with pkgs;
       }
     '');
 
+  runTestSuite = import ../build-support/run-test-suite { inherit stdenvNoCC; };
+
   addOpenGLRunpath = callPackage ../build-support/add-opengl-runpath { };
 
   quickemu = callPackage ../development/quickemu { };
