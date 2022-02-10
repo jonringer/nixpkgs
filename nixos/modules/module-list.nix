@@ -248,6 +248,7 @@
   ./security/rngd.nix
   ./security/rtkit.nix
   ./security/wrappers/default.nix
+  ./security/spire.nix
   ./security/sudo.nix
   ./security/doas.nix
   ./security/systemd-confinement.nix
