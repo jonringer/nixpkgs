@@ -2691,6 +2691,8 @@ in {
 
   eth-keys = callPackage ../development/python-modules/eth-keys { };
 
+  eth-rlp = callPackage ../development/python-modules/eth-rlp { };
+
   eth-typing = callPackage ../development/python-modules/eth-typing { };
 
   eth-utils = callPackage ../development/python-modules/eth-utils { };
