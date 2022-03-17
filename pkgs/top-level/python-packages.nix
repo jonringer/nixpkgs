@@ -2687,6 +2687,8 @@ in {
 
   eth-hash = callPackage ../development/python-modules/eth-hash { };
 
+  eth-keys = callPackage ../development/python-modules/eth-keys { };
+
   eth-typing = callPackage ../development/python-modules/eth-typing { };
 
   eth-utils = callPackage ../development/python-modules/eth-utils { };
