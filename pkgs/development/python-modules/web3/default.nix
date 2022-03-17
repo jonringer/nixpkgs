@@ -1,36 +1,55 @@
 { lib
 , buildPythonPackage
 , fetchFromGitHub
-, eth-utils
-, hexbytes
-, protobuf
-, requests
+, aiohttp
+, eth-abi
 , eth-account
+, eth-hash
+, eth-typing
+, eth-utils
+, jsonschema
+, hexbytes
+, ipfshttpclient
+, lru-dict
+, protobuf
+, pytestCheckHook
+, requests
+, websockets
 }:
 
 buildPythonPackage rec {
-  pname = "web3.py";
-  version = "ca662c8";
+  pname = "web3";
+  version = "ca662c879e95e9e184d9dfdb78855492e1d7db23";
 
   src = fetchFromGitHub {
     owner = "ethereum";
-    repo = pname;
-    rev = "ca662c879e95e9e184d9dfdb78855492e1d7db23";
+    repo = "web3.py";
+    rev = version;
     sha256 = "sha256-OeL4Lg1/ZCrEZQkZvCiGzcIn1X+F/BPBA4eFwF0SBoo=";
   };
 
   propagatedBuildInputs = [
+    aiohttp
+    eth-abi
     eth-account
+    eth-hash
+    eth-typing
     eth-utils
     hexbytes
+    ipfshttpclient
+    jsonschema
+    lru-dict
     protobuf
     requests
+    websockets
   ];
 
-  # The test needs MuJoCo that is not free library.
+  # almost all tests requires `eth-tester`, which is horribly out-of-date from the rest
+  # of the ethereum ecosystem
   doCheck = false;
-
-  # pythonImportsCheck = [ "gym" ];
+  checkInputs = [
+    pytestCheckHook
+  ];
 
   meta = with lib; {
     description = "A python interface for interacting with the Ethereum blockchain and ecosystem.";
