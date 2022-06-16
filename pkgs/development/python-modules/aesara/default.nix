@@ -28,7 +28,7 @@ buildPythonPackage rec {
     owner = "aesara-devs";
     repo = "aesara";
     rev = "refs/tags/rel-${version}";
-    hash = "sha256-NJxklOpIbSbi/SB/rafBNllpnNb1yWLVpyB2f/U0i78=";
+    hash = "sha256-vIDyqYj9HuH5gVcc6KPkB2NNTAggiPHyAR2fCXOQzsE=";
   };
 
   nativeBuildInputs = [
